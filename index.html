@@ -336,5 +336,19 @@ function renderResults(){const correct=saved.attempts.filter(a=>a.correct).lengt
 function exportProgress(){const blob=new Blob([JSON.stringify(saved,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="sds711-progress.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 function resetProgress(){if(!confirm("Delete saved practice and mock results on this device?"))return;saved={attempts:[],mockAttempts:[],missed:[]};persist();renderResults()}
 mockSetup();renderHome();
+
+const actualQuestions=[["What is computational thinking?",["Solving problems using logic","Writing software applications","Designing computer hardware","Managing digital information"],0],["Which is NOT a component of computational thinking?",["Decomposition","Abstraction","Pattern recognition","Hardware assembly"],3],["What is an algorithm?",["A type of software","A set of instructions","A computer processor","A storage device"],1],["Which programming construct repeats instructions?",["Variable","Function","Loop","Comment"],2],["Which data type represents logical values?",["Float","String","Integer","Boolean"],3],["What is the primary purpose of Git?",["Managing databases","Creating websites","Tracking changes","Analyzing data"],2],["Which command records staged changes in Git?",["git fetch","git commit","git branch","git reset"],1],["Which best describes GitHub?",["A coding language","A hosting platform","A database system","A software editor"],1],["What does git pull do?",["Uploads local changes","Creates a new branch","Deletes remote files","Retrieves remote updates"],3],["Which symbol assigns a value in Python?",[":","==","=","->"],2],["What is print(3 + 4 * 2)?",["10","11","12","14"],1],["For x=5, what does if x>3: print('Yes') display?",["Yes","No","False","Error"],0],["Which symbol is commonly used for assignment in R?",["==","=>","<-",":="],2],["Which R function displays output on the screen?",["show()","print()","write()","output()"],1],["What is length(x) when x <- c(1,2,3)?",["1","2","3","4"],2]];
+let actualAnswers=Array(15).fill(null),actualIndex=0,actualFinished=false;
+function renderActualQuiz(){
+ const box=document.getElementById('quiz1Box');
+ if(actualFinished){
+ const score=actualQuestions.filter((q,i)=>actualAnswers[i]===q[2]).length;
+ box.innerHTML='<h2>Score: '+score+'/15 ('+(score/15*100).toFixed(1)+'%)</h2><p>Correct answers and review:</p>'+actualQuestions.map((q,i)=>'<div class="card" style="margin:12px 0"><strong>'+(i+1)+'. '+esc(q[0])+'</strong><p>Your answer: '+(actualAnswers[i]===null?'Unanswered':"ABCD"[actualAnswers[i]]+' — '+esc(q[1][actualAnswers[i]]))+'</p><p>Correct answer: <strong>'+"ABCD"[q[2]]+' — '+esc(q[1][q[2]])+'</strong></p></div>').join('')+'<button class="btn" onclick="actualAnswers=Array(15).fill(null);actualIndex=0;actualFinished=false;renderActualQuiz()">Retake</button>';
+ return;
+ }
+ const q=actualQuestions[actualIndex];
+ box.innerHTML='<h3>Question '+(actualIndex+1)+' of 15</h3><p>'+esc(q[0])+'</p>'+q[1].map((o,i)=>'<label style="display:block;padding:12px;border:1px solid #ddd;border-radius:8px;margin:8px 0"><input type="radio" name="actual" '+(actualAnswers[actualIndex]===i?'checked':'')+' onchange="actualAnswers[actualIndex]='+i+'"> '+ "ABCD"[i]+'. '+esc(o)+'</label>').join('')+'<div class="controls"><button class="btn outline" '+(actualIndex===0?'disabled':'')+' onclick="actualIndex--;renderActualQuiz()">Previous</button>'+(actualIndex===14?'<button class="btn" onclick="actualFinished=true;renderActualQuiz()">Submit & Review</button>':'<button class="btn" onclick="actualIndex++;renderActualQuiz()">Next question</button>')+'</div>';
+}
+renderActualQuiz();
 </script>
 </body></html>
